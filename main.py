@@ -38,7 +38,6 @@ class CliAgent:
                 tools=self.tools,
                 timeout=60,  # 设置60秒超时
             )
-            print("模型响应成功")
             return response
         except Exception as e:
             print(f"调用模型失败: {e}")
@@ -88,5 +87,9 @@ class CliAgent:
 
 if __name__ == "__main__":
     agent = CliAgent()
-    # agent.run("在本地新建一个文件叫test.txt，并写入“Hello World”")
-    agent.run("当前目录下有哪些文件？ 并且读取所有文件内容，写一个catalogue.md")
+    while True:
+        user_input = input("请输入: ")
+        if user_input == "exit":
+            print("byebye")
+            break
+        agent.run(user_input)
