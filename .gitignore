@@ -10,3 +10,6 @@ temp
 # log文件
 logs
 *.log  
+
+# 缓存文件
+__pycache__
