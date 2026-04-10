@@ -6,3 +6,7 @@ test.*
 temp.*
 test
 temp
+
+# log文件
+logs
+*.log  

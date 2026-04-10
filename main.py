@@ -1,33 +1,36 @@
-from OSTools import read_file, write_file, get_file_path
+from Tools.OSTools import read_file, write_file, get_file_path
+from pathlib import Path
 from openai import OpenAI
 import tiktoken
 import json
 import os
 
+from utils.logger import setup_logger
 
 class Config:
     API_KEY = os.environ.get("ZHI_PU_API_KEY")
     BASE_URL = "https://open.bigmodel.cn/api/paas/v4/"
+    LOG_DIR = Path("./logs")
     MODEL = "glm-4"
+    _logger = None
 
-
+logger = setup_logger(__name__, Config.LOG_DIR)
+    
 class CliAgent:
-
     def __init__(self):
-        print("正在创建 OpenAI 客户端...")
         self.client = OpenAI(
             api_key=Config.API_KEY,
             base_url=Config.BASE_URL,
         )
-        print("OpenAI 客户端创建成功")
+        logger.debug("OpenAI 客户端创建成功")
         
         # Token 计算
-        print("正在初始化分词器...")
         try:
             self.encoding = tiktoken.encoding_for_model(Config.MODEL)
+            logger.debug("分词器初始化成功...")
         except:
             self.encoding = tiktoken.get_encoding("cl100k_base")
-            print(f"未找到模型: {Config.MODEL}的分词器，使用 cl100k_base")
+            logger.debug(f"未找到模型: {Config.MODEL}的分词器，使用 cl100k_base")
 
         self.func_map = {
             "get_file_path": get_file_path,
@@ -80,7 +83,7 @@ class CliAgent:
             )
             return response
         except Exception as e:
-            print(f"调用模型失败: {e}")
+            logger.error(f"调用模型失败: {e}")
             raise
 
     def run(self, user_input):
@@ -100,10 +103,10 @@ class CliAgent:
             # 读取响应
             msg = response.choices[0].message
             
-            print(f"输入token数（模型接收到的总token）: {input_token_count}")
+            print(f"输入token: {input_token_count}")
             
             output_token_count = self.count_tokens(msg.content)
-            print(f"输出token数: {output_token_count}")
+            print(f"输出token: {output_token_count}")
             
             self.messages.append(msg)
             if not msg.tool_calls:
@@ -132,11 +135,12 @@ class CliAgent:
 
 
 if __name__ == "__main__":
-    print("正在初始化 Agent...")
+    exit = ["exit", "quit", "e", "E"]
     agent = CliAgent()
+    logger.debug("CliAgent 启动成功...")
     while True:
         user_input = input("请输入: ")
-        if user_input == "exit":
+        if user_input in exit:
             print("byebye")
             break
         agent.run(user_input)
