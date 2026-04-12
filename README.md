@@ -12,6 +12,10 @@ git clone https://github.com/Wind031013/Wind-Code.git
 cd Wind-Code
 # 安装依赖包
 pip install .
+# 运行项目
+wind
+# 单例运行项目
+wind 你好
 ```
 在开始使用前，请先配置您的 API 密钥。您需要将密钥赋值给环境变量 `ZHI_PU_API_KEY`。
 ### linux/macOS:
@@ -22,6 +26,10 @@ export ZHI_PU_API_KEY=<YOUR_API_KEY>
 ``` bash
 $env:ZHI_PU_API_KEY="<YOUR_API_KEY>"
 ```
+
+## 📚 使用教程
+### 指令记忆
+可在项目页创建WIND.md文件，将指令写入文件中，WIND会自动读取并执行。
 
 ## 🛠️ 核心架构(Idea/待实现功能)
 > 标注备注： ✅以实现、🔄开发中、⏳ 规划中、❌ 已废弃
@@ -40,7 +48,7 @@ $env:ZHI_PU_API_KEY="<YOUR_API_KEY>"
 ## 🧠 多级上下文管理体系
 
 ### 1. 指令记忆 (Instruction Memory)
-* ⏳**指令约束**：通过读取本地WIND.md文件，读取行为准则，确保输出符合预设规范。
+* ✅**指令约束**：通过读取本地WIND.md文件，读取行为准则，确保输出符合预设规范。
 
 ### 2. 短期记忆 (Short-term Memory)
 * ⏳**状态机管理**：基于状态机维护当前对话的逻辑上下文，防止任务漂移。
