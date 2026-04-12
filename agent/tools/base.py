@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Any
 
-# 危险级别
+
 class RiskLevel(Enum):
     SAFE = "safe"
     MODERATE = "moderate"

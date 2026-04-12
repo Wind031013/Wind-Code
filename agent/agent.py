@@ -4,28 +4,33 @@ from pathlib import Path
 from openai import OpenAI
 import tiktoken
 
-from tools.base import BaseTool, ToolResult, RiskLevel
-from tools.OSTools import (
+from agent.tools.base import BaseTool, ToolResult, RiskLevel
+from agent.tools.OSTools import (
     GetFilePathTool,
     ReadFileTool,
     WriteFileTool,
     DeleteFileTool,
     ListDirTool,
 )
-from tools.TerminalTool import RunCommandTool
-from utils.logger import setup_logger
+from agent.tools.TerminalTool import RunCommandTool
+from agent.utils.logger import setup_logger
+
+
+PACKAGE_DIR = Path(__file__).parent
 
 
 class Config:
     API_KEY = os.environ.get("ZHI_PU_API_KEY")
     BASE_URL = "https://open.bigmodel.cn/api/paas/v4/"
-    LOG_DIR = Path("./logs")
-    TOOLS_JSON = Path("./tools/tools.json")
-    PROMPT_PATH = Path("./prompt")
+    LOG_DIR = Path.cwd() / "logs"
+    TOOLS_JSON = PACKAGE_DIR / "tools" / "tools.json"
+    PROMPT_PATH = PACKAGE_DIR / "prompt"
+    MEMORY_PATH = Path.cwd() / "memory"
+    INSTRUCTION_PATH = Path.cwd() / "WIND.md"
     MODEL = "glm-4"
 
 
-logger = setup_logger(__name__, Config.LOG_DIR)
+logger = setup_logger(__name__, str(Config.LOG_DIR))
 
 
 class HumanApproval:
@@ -73,16 +78,13 @@ class ToolRegistry:
 
 
 class CliAgent:
-
     def __init__(self):
-        # 初始化OpenAI客户端
         self.client = OpenAI(
             api_key=Config.API_KEY,
             base_url=Config.BASE_URL,
         )
         logger.debug("OpenAI 客户端创建成功")
 
-        # Token 计算
         try:
             self.encoding = tiktoken.encoding_for_model(Config.MODEL)
             logger.debug("分词器初始化成功...")
@@ -90,7 +92,12 @@ class CliAgent:
             self.encoding = tiktoken.get_encoding("cl100k_base")
             logger.debug(f"未找到模型: {Config.MODEL}的分词器，使用 cl100k_base")
 
-        # 加载主提示词
+        if Config.INSTRUCTION_PATH.exists():
+            self.instructions = Config.INSTRUCTION_PATH.read_text(encoding="utf-8")
+            logger.debug("加载指令记忆成功...")
+        else:
+            self.instructions = ""
+
         main_prompt_path = Config.PROMPT_PATH / "main.md"
         if main_prompt_path.exists():
             self.main_prompt = main_prompt_path.read_text(encoding="utf-8")
@@ -98,14 +105,17 @@ class CliAgent:
         else:
             logger.warning(f"未找到提示文件: {main_prompt_path}")
             self.main_prompt = "你是一个ai助手。"
-        # 工具映射表
+
+        self.system_prompt = (
+            self.main_prompt
+            + self.instructions
+            + "\n现在，请接收用户指令，开始你的工作。"
+        )
+
         self.registry = ToolRegistry()
         self._register_tools()
-        # 注册工具
         self.tools_schema = self._load_tools_schema()
-
-        # 初始化对话历史
-        self.messages = [{"role": "system", "content": self.main_prompt}]
+        self.messages = [{"role": "system", "content": self.system_prompt}]
 
     def _register_tools(self):
         tools = [
@@ -140,8 +150,7 @@ class CliAgent:
             logger.error(f"调用模型失败: {e}")
             raise
 
-    def _execute_tool_with_hitl(self, tool_name: str,
-                                kwargs: dict) -> ToolResult:
+    def _execute_tool_with_hitl(self, tool_name: str, kwargs: dict) -> ToolResult:
         tool = self.registry.get(tool_name)
         if not tool:
             return ToolResult(f"工具不存在: {tool_name}", success=False)
@@ -166,38 +175,42 @@ class CliAgent:
         print(f"{status} {tool_name}: {result.output[:200]}")
         return result
 
+    def save_history(self, history):
+        Config.MEMORY_PATH.mkdir(parents=True, exist_ok=True)
+
+        with open(Config.MEMORY_PATH / "history.json", "w", encoding="utf-8") as f:
+            json.dump(self.messages, f, ensure_ascii=False, indent=2)
+
     def run(self, user_input: str):
-        # 添加用户消息到对话历史
         self.messages.append({"role": "user", "content": user_input})
 
         while True:
-            # 发送请求
             response = self.call_model()
-            # 读取响应
             msg = response.choices[0].message
 
-            self.messages.append({
-                "role":
-                "assistant",
-                "content":
-                msg.content,
-                "tool_calls":
-                [{
-                    "id": tc.id,
-                    "type": "function",
-                    "function": {
-                        "name": tc.function.name,
-                        "arguments": tc.function.arguments,
-                    },
-                }
-                 for tc in (msg.tool_calls or [])] if msg.tool_calls else None,
-            })
+            new_content = {
+                "role": "assistant",
+                "content": msg.content,
+                "tool_calls": [
+                    {
+                        "id": tc.id,
+                        "type": "function",
+                        "function": {
+                            "name": tc.function.name,
+                            "arguments": tc.function.arguments,
+                        },
+                    }
+                    for tc in (msg.tool_calls or [])
+                ]
+                if msg.tool_calls
+                else None,
+            }
 
+            self.messages.append(new_content)
             if not msg.tool_calls:
                 if msg.content:
                     print(f"\n{msg.content}")
                 break
-            # 获取工具调用
             for tool_call in msg.tool_calls:
                 func_name = tool_call.function.name
                 try:
@@ -206,32 +219,10 @@ class CliAgent:
                 except Exception as e:
                     result = ToolResult(f"执行函数异常: {e}", success=False)
 
-                self.messages.append({
-                    "role": "tool",
-                    "tool_call_id": tool_call.id,
-                    "content": str(result),
-                })
-
-
-if __name__ == "__main__":
-    exit_words = ["exit", "quit", "e", "E"]
-    agent = CliAgent()
-    logger.debug("CliAgent 启动成功...")
-    while True:
-        try:
-            user_input = input("\n请输入: ").strip()
-        except (KeyboardInterrupt, EOFError):
-            print("\nbyebye")
-            break
-
-        if not user_input:
-            continue
-        if user_input in exit_words:
-            print("byebye")
-            break
-
-        try:
-            agent.run(user_input)
-        except Exception as e:
-            logger.error(f"运行出错: {e}")
-            print(f"运行出错: {e}")
+                self.messages.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": tool_call.id,
+                        "content": str(result),
+                    }
+                )

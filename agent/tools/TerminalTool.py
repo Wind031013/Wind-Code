@@ -1,5 +1,5 @@
 import subprocess
-from tools.base import BaseTool, ToolResult, RiskLevel
+from agent.tools.base import BaseTool, ToolResult, RiskLevel
 
 
 BLOCKED_PATTERNS = [

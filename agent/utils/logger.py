@@ -6,10 +6,9 @@ from pathlib import Path
 def setup_logger(
     name: str = "cli_agent",
     log_dir: str = "./logs",
-    console_level: int = logging.DEBUG,
-    file_level: int = logging.INFO,
+    console_level: int = logging.ERROR,
+    file_level: int = logging.ERROR,
 ) -> logging.Logger:
-    """创建并返回一个配置好的logger"""
     log_path = Path(log_dir)
     log_path.mkdir(parents=True, exist_ok=True)
     fmt = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -20,7 +19,6 @@ def setup_logger(
         return logger
 
     formatter = logging.Formatter(fmt, datefmt="%Y-%m-%d %H:%M:%S")
-    # 设置文件日志级别
     file_handler = RotatingFileHandler(
         log_path / "app.log",
         maxBytes=1024 * 1024,
@@ -29,7 +27,6 @@ def setup_logger(
     )
     file_handler.setLevel(file_level)
     file_handler.setFormatter(formatter)
-    # 设置控制台日志级别
     console_handler = logging.StreamHandler()
     console_handler.setLevel(console_level)
     console_handler.setFormatter(formatter)

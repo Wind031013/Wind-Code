@@ -13,3 +13,11 @@ logs
 
 # 缓存文件
 __pycache__
+
+# 构建产物
+dist
+build
+*.egg-info
+
+# 指令记忆
+WIND.md

@@ -4,6 +4,15 @@
 
 ---
 ## 🚀 快速开始
+### 克隆仓库
+``` bash
+# 克隆仓库
+git clone https://github.com/Wind031013/Wind-Code.git
+# 进入项目目录
+cd Wind-Code
+# 安装依赖包
+pip install .
+```
 在开始使用前，请先配置您的 API 密钥。您需要将密钥赋值给环境变量 `ZHI_PU_API_KEY`。
 ### linux/macOS:
 ``` bash
@@ -31,8 +40,7 @@ $env:ZHI_PU_API_KEY="<YOUR_API_KEY>"
 ## 🧠 多级上下文管理体系
 
 ### 1. 指令记忆 (Instruction Memory)
-* ⏳**指令约束**：通过上下文固化行为准则，确保输出符合预设规范。
-    - 使用固定步长读取策。
+* ⏳**指令约束**：通过读取本地WIND.md文件，读取行为准则，确保输出符合预设规范。
 
 ### 2. 短期记忆 (Short-term Memory)
 * ⏳**状态机管理**：基于状态机维护当前对话的逻辑上下文，防止任务漂移。

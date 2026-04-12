@@ -1,5 +1,5 @@
 import os
-from tools.base import BaseTool, ToolResult, RiskLevel
+from agent.tools.base import BaseTool, ToolResult, RiskLevel
 
 
 class GetFilePathTool(BaseTool):
@@ -50,21 +50,17 @@ class WriteFileTool(BaseTool):
     description = "将内容写入指定路径的文件（会覆盖已有文件）"
     risk_level = RiskLevel.DANGEROUS
 
-    def confirm_message(self,
-                        path: str = "",
-                        content: str = "",
-                        **kwargs) -> str:
+    def confirm_message(self, path: str = "", content: str = "", **kwargs) -> str:
         is_overwrite = os.path.exists(path)
         action = "覆盖" if is_overwrite else "创建"
         preview = content[:200] + "..." if len(content) > 200 else content
-        return (f"⚠️  写入文件 [{action}]: {path}\n"
-                f"    内容预览 ({len(content)} 字符):\n"
-                f"    {preview}")
+        return (
+            f"⚠️  写入文件 [{action}]: {path}\n"
+            f"    内容预览 ({len(content)} 字符):\n"
+            f"    {preview}"
+        )
 
-    def execute(self,
-                path: str = "",
-                content: str = "",
-                **kwargs) -> ToolResult:
+    def execute(self, path: str = "", content: str = "", **kwargs) -> ToolResult:
         try:
             dir_path = os.path.dirname(path)
             if dir_path and not os.path.exists(dir_path):
@@ -92,6 +88,7 @@ class DeleteFileTool(BaseTool):
             return ToolResult(f"Successfully deleted {path}")
         except Exception as e:
             return ToolResult(f"Error: {str(e)}", success=False)
+
 
 class ListDirTool(BaseTool):
     name = "list_dir"
