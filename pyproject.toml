@@ -19,4 +19,4 @@ wind = "agent.cli:main"
 include = ["agent*"]
 
 [tool.setuptools.package-data]
-windcode = ["prompt/*.md", "tools/tools.json"]
+agent = ["prompt/*.md", "tools/tools.json"]
