@@ -14,7 +14,6 @@ from agent.tools.OSTools import (
 )
 from agent.tools.TerminalTool import RunCommandTool
 from agent.utils.logger import setup_logger
-from agent.utils.version import VersionManager
 
 
 PACKAGE_DIR = Path(__file__).parent
@@ -118,9 +117,6 @@ class CliAgent:
         self.tools_schema = self._load_tools_schema()
         self.messages = [{"role": "system", "content": self.system_prompt}]
 
-        self.version_manager = VersionManager(os.getcwd())
-        self.current_instruction = ""
-
     def _register_tools(self):
         tools = [
             GetFilePathTool(),
@@ -177,14 +173,6 @@ class CliAgent:
         result = tool.execute(**kwargs)
         status = "✅" if result.success else "❌"
         print(f"{status} {tool_name}: {result.output[:200]}")
-
-        if result.success and tool_name in VersionManager.SNAPSHOT_TOOLS:
-            snapshot_ok, snapshot_msg = self.version_manager.create_snapshot(
-                self.current_instruction
-            )
-            if snapshot_ok and "跳过快照" not in snapshot_msg:
-                print(f"📸 {snapshot_msg}")
-
         return result
 
     def save_history(self, history):
@@ -194,7 +182,6 @@ class CliAgent:
             json.dump(self.messages, f, ensure_ascii=False, indent=2)
 
     def run(self, user_input: str):
-        self.current_instruction = user_input
         self.messages.append({"role": "user", "content": user_input})
 
         while True:
