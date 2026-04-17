@@ -107,5 +107,22 @@
                 "required": ["command"]
             }
         }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "wind_router",
+            "description": "当遇到复杂任务且有不清楚的地方需要征求用户意见时，向用户提出问题并获取用户的选择或输入。支持一次提出多个问题批量收集回答。例如：任务有多种实现方案需要用户决策、需求存在歧义需要用户澄清、关键操作需要确认方向等场景",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "questions_json": {
+                        "type": "string",
+                        "description": "JSON数组字符串，每项包含question(问题文本)和可选的options(预设选项，用|分隔)。例如: '[{\"question\":\"使用哪个框架？\",\"options\":\"React|Vue\"},{\"question\":\"项目名称？\"}]'"
+                    }
+                },
+                "required": ["questions_json"]
+            }
+        }
     }
 ]

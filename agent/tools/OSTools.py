@@ -1,12 +1,16 @@
 import os
 from agent.tools.base import BaseTool, ToolResult, RiskLevel
+from agent.utils.logger import setup_logger
 
+logger = setup_logger(__name__)
 
 class GetFilePathTool(BaseTool):
+    """
+    获取当前工作目录以及该目录下的所有文件名
+    """
     name = "get_file_path"
     description = "获取当前工作目录以及该目录下的所有文件名"
     risk_level = RiskLevel.SAFE
-
     def execute(self, **kwargs) -> ToolResult:
         current_dir = os.getcwd()
         try:
@@ -21,6 +25,7 @@ class GetFilePathTool(BaseTool):
                     dirs.append(item)
 
             result = f"当前目录: {current_dir}\n"
+            logger.debug("已获取目录下的文件和文件夹")
             if files:
                 result += f"\n文件 ({len(files)}个):\n" + "\n".join(files)
 

@@ -5,8 +5,8 @@ from pathlib import Path
 
 def setup_logger(
     name: str = "cli_agent",
-    log_dir: str = "./logs",
-    console_level: int = logging.ERROR,
+    log_dir: str = Path.cwd() / "WindCodeLogs",
+    console_level: int = logging.DEBUG,
     file_level: int = logging.ERROR,
 ) -> logging.Logger:
     log_path = Path(log_dir)

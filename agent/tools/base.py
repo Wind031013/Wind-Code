@@ -10,6 +10,12 @@ class RiskLevel(Enum):
 
 
 class ToolResult:
+    """
+    工具调用结果
+    output: 输出结果
+    success: 是否成功
+    metadata: 元数据
+    """
     def __init__(self, output: str, success: bool = True, metadata: dict = None):
         self.output = output
         self.success = success
@@ -20,6 +26,7 @@ class ToolResult:
 
 
 class BaseTool(ABC):
+    """工具基类"""
     name: str = ""
     description: str = ""
     risk_level: RiskLevel = RiskLevel.SAFE

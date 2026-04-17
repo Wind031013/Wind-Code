@@ -13,6 +13,7 @@ from agent.tools.OSTools import (
     ListDirTool,
 )
 from agent.tools.TerminalTool import RunCommandTool
+from agent.tools.wind_router import WindRouterTool
 from agent.utils.logger import setup_logger
 from agent.utils.version import VersionManager
 
@@ -23,7 +24,6 @@ PACKAGE_DIR = Path(__file__).parent
 class Config:
     API_KEY = os.environ.get("ZHI_PU_API_KEY")
     BASE_URL = "https://open.bigmodel.cn/api/paas/v4/"
-    LOG_DIR = Path.cwd() / "WindCodeLogs"
     TOOLS_JSON = PACKAGE_DIR / "tools" / "tools.json"
     PROMPT_PATH = PACKAGE_DIR / "prompt"
     MEMORY_PATH = Path.cwd() / "memory"
@@ -31,7 +31,7 @@ class Config:
     MODEL = "glm-4"
 
 
-logger = setup_logger(__name__, str(Config.LOG_DIR))
+logger = setup_logger(__name__)
 
 
 class HumanApproval:
@@ -129,6 +129,7 @@ class CliAgent:
             DeleteFileTool(),
             ListDirTool(),
             RunCommandTool(),
+            WindRouterTool(),
         ]
         for tool in tools:
             self.registry.register(tool)
