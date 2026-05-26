@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "WindCode"
+version = "0.1.0"
+description = "智能 Agent 编程协作工具"
+requires-python = ">=3.10"
+dependencies = [
+    "openai>=1.0.0"
+]
+
+[project.scripts]
+wind = "main:main"
+
+[tool.setuptools]
+py-modules = ["main", "agent"]
+packages = ["tools", "utils"]
+
+[tool.setuptools.package-data]
+agent = ["prompt/*.md", "tools/tools.json"]
