@@ -6,6 +6,7 @@ from tools.os_tools import (
     DeleteFile,
 )
 from tools.terminal_tool import CommandTool
+from tools.wind_router import WindRouter
 from utils.logger import setup_logger
 from enum import Enum
 import json
@@ -43,6 +44,7 @@ class UseTools:
             WriteFile(),
             DeleteFile(),
             CommandTool(),
+            WindRouter(),
         ]
         self.registry = ToolRegistry()
         for tool in tools:

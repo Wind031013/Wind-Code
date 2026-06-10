@@ -25,3 +25,6 @@ WindCodeLogs/
 
 # Environment
 .env
+
+# Test
+test.*
