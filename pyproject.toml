@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [project.scripts]
-wind = "main:main"
+windcode = "main:main"
 
 [tool.setuptools]
 py-modules = ["main", "agent"]

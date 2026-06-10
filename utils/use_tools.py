@@ -3,8 +3,9 @@ from tools.os_tools import (
     GetFilePath,
     GetFileContent,
     WriteFile,
-    DeleteFile
+    DeleteFile,
 )
+from tools.terminal_tool import CommandTool
 from utils.logger import setup_logger
 from enum import Enum
 import json
@@ -41,6 +42,7 @@ class UseTools:
             GetFileContent(),
             WriteFile(),
             DeleteFile(),
+            CommandTool(),
         ]
         self.registry = ToolRegistry()
         for tool in tools:

@@ -5,6 +5,7 @@ class Config:
     BASE_URL = os.environ.get("WindCode_BASE_URL")
     MODEL = "deepseek-v4-flash"
     TOOLS_JSON = Path(__file__).parent.parent / "tools" / "tools.json"
+    COMMAND_PATH = Path.cwd() / "WIND.md"
 
 class Prompt:
     MAIN_PROMPT = Path(__file__).parent / "prompt" / "main.md"

@@ -63,5 +63,30 @@
                 }
             }
         }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "command_tool",
+            "description": "在终端中执行shell命令并返回结果。可用于运行构建、测试、git等命令",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "command": {
+                        "type": "string",
+                        "description": "要执行的shell命令"
+                    },
+                    "cwd": {
+                        "type": "string",
+                        "description": "工作目录，默认为当前目录"
+                    },
+                    "timeout": {
+                        "type": "integer",
+                        "description": "超时时间（秒），默认120秒"
+                    }
+                },
+                "required": ["command"]
+            }
+        }
     }
 ]

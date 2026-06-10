@@ -1,16 +1,28 @@
 from utils.model import load_main_prompt
 from openai.types.chat import ChatCompletionMessage
+from utils.config import Config
+from utils.logger import setup_logger
 
+logger = setup_logger(__name__)
 
 class MessagesManager:
     def __init__(self, short_term_size: int):
         self.short_term_size = short_term_size
+        self.command_path = Config.COMMAND_PATH
         self.messages = self.init_messages()
-        pass
 
     def init_messages(self):
+        main_prompt = load_main_prompt()
+        if self.command_path.exists():
+            try:
+                self.command_messages = self.command_path.read_text(encoding="utf-8")
+                logger.debug("指令记忆加载成功")
+            except Exception as e:
+                self.command_messages = ""
+                logger.error(f"指令记忆读取错误：{e}")
+        system_prompt = main_prompt + self.command_messages
         messages = [
-            {"role": "system", "content": load_main_prompt()},
+            {"role": "system", "content": system_prompt},
         ]
         return messages
     def add_user_message(self, user_input):
