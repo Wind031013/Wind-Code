@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "WindCode"
-version = "0.1.0"
+version = "0.2.0"
 description = "智能 Agent 编程协作工具"
 requires-python = ">=3.10"
 dependencies = [
@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [project.scripts]
-windcode = "main:main"
+wind = "main:main"
 
 [tool.setuptools]
 py-modules = ["main", "agent"]
