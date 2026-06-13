@@ -41,8 +41,8 @@ class GetFileContent(BaseTool):
     risk_level = RiskLevel.SAFE
 
     def execute(self, file_path: str = "", **kwargs) -> ToolResult:
-        if not os.path.exists(file_path):
-            return ToolResult(f"文件不存在: {file_path}", success=False)
+        if not os.path.isfile(file_path):
+            return ToolResult(f"文件不存在或不是普通文件: {file_path}", success=False)
         try:
             with open(file_path, "r", encoding="utf-8") as f:
                 content = f.read()
